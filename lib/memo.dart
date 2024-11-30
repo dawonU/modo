@@ -179,7 +179,7 @@ class _MemoPageState extends State<MemoPage> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('메모 검색'),
+          title: const Text('메모 검색'
           content: TextField(
             controller: searchController,
             decoration: const InputDecoration(labelText: '검색어 입력'),
