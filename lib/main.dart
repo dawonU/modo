@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:modo/LogIn.dart';
 import 'package:modo/memo.dart';
+import 'package:modo/todo.dart';
 import 'navigation_bar.dart';
 
 
@@ -18,9 +19,11 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MemoPage(), // 초기 화면을 LogIn으로 설정
+      home: TodoPage(), // 초기 화면을 LogIn으로 설정
       debugShowCheckedModeBanner: false,
     );
   }
 }
+
+
 

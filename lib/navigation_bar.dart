@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:modo/todo.dart';
+import 'memo.dart'; // MemoPage 파일 가져오기
+import 'myPage.dart';
+
 
 import 'memo.dart';
 import 'myPage.dart';
@@ -41,3 +44,4 @@ class NavigationController extends GetxController {
     TodoPage(),
   ];
 }
+
