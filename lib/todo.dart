@@ -1,16 +1,4 @@
 import 'package:flutter/material.dart';
-<<<<<<< HEAD
-
-class TodoPage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text("TODO Page")),
-      body: Center(child: Text("Welcome to TODO Page!")),
-    );
-  }
-}
-=======
 import 'package:table_calendar/table_calendar.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 
@@ -317,4 +305,3 @@ class _TodoPageState extends State<TodoPage> {
     );
   }
 }
->>>>>>> master

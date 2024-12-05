@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-<<<<<<< HEAD
-import 'SignUp.dart'; // SignUpScreen을 가져옵니다.
-=======
 import 'SignUp.dart';
 import 'navigation_bar.dart'; // SignUpScreen을 가져옵니다.
->>>>>>> master
 
 void main() => runApp(LogIn());
 
@@ -68,13 +64,9 @@ class _LoginPageState extends State<LoginPage> {
         SnackBar(content: Text('로그인 성공!')),
       );
       // 로그인 성공 후 다음 화면으로 이동
-<<<<<<< HEAD
-      // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => NextPage()));
-=======
       Navigator.pushReplacement(context,
         MaterialPageRoute(builder: (context) => NavigationMenu()),
       );
->>>>>>> master
     } on FirebaseAuthException catch (e) {
       String message;
       if (e.code == 'user-not-found') {

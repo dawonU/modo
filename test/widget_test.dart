@@ -7,12 +7,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-<<<<<<< HEAD
 import 'package:modo/main.dart';
-=======
-import 'package:modo2/main.dart';
->>>>>>> master
+
 
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {

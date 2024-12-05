@@ -90,21 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "com.example" "\0"
-<<<<<<< HEAD
-            VALUE "FileDescription", "modo" "\0"
-            VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "modo" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2024 com.example. All rights reserved." "\0"
-            VALUE "OriginalFilename", "modo.exe" "\0"
-            VALUE "ProductName", "modo" "\0"
-=======
             VALUE "FileDescription", "modo2" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
             VALUE "InternalName", "modo2" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2024 com.example. All rights reserved." "\0"
             VALUE "OriginalFilename", "modo2.exe" "\0"
             VALUE "ProductName", "modo2" "\0"
->>>>>>> master
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

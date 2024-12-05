@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-# modo
-=======
 # modo2
->>>>>>> master
 
 A new Flutter project.
 
