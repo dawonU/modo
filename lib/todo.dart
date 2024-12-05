@@ -41,6 +41,7 @@ class _TodoPageState extends State<TodoPage> {
           'completed': false,
         });
 
+        // Add the category's color to the date in the calendar
         if (dateColors[date] == null) {
           dateColors[date] = [];
         }
@@ -182,7 +183,7 @@ class _TodoPageState extends State<TodoPage> {
               },
             ),
           ),
-          const SizedBox(height: 16, width: 20,),
+          const SizedBox(height: 16),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: ElevatedButton.icon(
@@ -190,12 +191,12 @@ class _TodoPageState extends State<TodoPage> {
               icon: const Icon(Icons.add, size: 20),
               label: const Text('카테고리 추가', style: TextStyle(fontSize: 14)),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Color(0xFF919191),
+                backgroundColor: Colors.grey[700],
                 foregroundColor: Colors.white,
                 elevation: 0,
-                minimumSize: const Size.fromHeight(30),
+                minimumSize: const Size.fromHeight(50),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(12),
                 ),
               ),
             ),
@@ -210,66 +211,88 @@ class _TodoPageState extends State<TodoPage> {
                 final tasks = categories[categoryName]['tasks'][_selectedDay] ?? [];
 
                 return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 10.0),
+                  padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 16.0),
                   child: Container(
-                    constraints: BoxConstraints(
-                      minHeight: 30,
-                      maxWidth: MediaQuery.of(context).size.width * 0.9,
-                    ),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFFFFFFF),
-                      borderRadius: BorderRadius.circular(20),
-
+                      color: const Color(0xFFF5F5F5),
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                    padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 10),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Container(
-                              width: 10,
-                              height: 10,
-                              decoration: BoxDecoration(
-                                color: categoryColor,
-                                shape: BoxShape.circle,
-                              ),
+                            Row(
+                              children: [
+                                Container(
+                                  width: 12,
+                                  height: 12,
+                                  decoration: BoxDecoration(
+                                    color: categoryColor,
+                                    shape: BoxShape.circle,
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  categoryName,
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
                             ),
-                            const SizedBox(width: 8),
-                            Text(
-                              categoryName,
-                              style: const TextStyle(
-                                fontSize:  17,
-                                fontWeight: FontWeight.w400,
-                              ),
+                            Row(
+                              children: [
+                                IconButton(
+                                  onPressed: () {
+                                    _showAddTaskDialog(categoryName);
+                                  },
+                                  icon: const Icon(Icons.add_circle_outline, size: 20),
+                                  color: Colors.grey,
+                                ),
+                                IconButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      expandedState[categoryName] = !(expandedState[categoryName] ?? true);
+                                    });
+                                  },
+                                  icon: Icon(
+                                    expandedState[categoryName] ?? true
+                                        ? Icons.expand_less
+                                        : Icons.expand_more,
+                                    size: 20,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),
-                        Row(
-                          children: [
-                            IconButton(
-                              onPressed: () {
-                                _showAddTaskDialog(categoryName);
-                              },
-                              icon: const Icon(Icons.add_circle_outline, size: 18),
-                              color: Colors.grey,
-                            ),
-                            IconButton(
-                              onPressed: () {
-                                setState(() {
-                                  expandedState[categoryName] = !(expandedState[categoryName] ?? true);
-                                });
-                              },
-                              icon: Icon(
-                                expandedState[categoryName] ?? true
-                                    ? Icons.expand_less
-                                    : Icons.expand_more,
-                                size: 18,
-                                color: Colors.grey,
+                        if (expandedState[categoryName] ?? true)
+                          ...tasks.map<Widget>((task) {
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 4.0),
+                              child: Row(
+                                children: [
+                                  Checkbox(
+                                    value: task['completed'],
+                                    onChanged: (value) {
+                                      setState(() {
+                                        task['completed'] = value;
+                                      });
+                                    },
+                                  ),
+                                  Text(
+                                    task['task'],
+                                    style: const TextStyle(fontSize: 14),
+                                  ),
+                                ],
                               ),
-                            ),
-                          ],
-                        ),
+                            );
+                          }).toList(),
                       ],
                     ),
                   ),
