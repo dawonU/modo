@@ -37,7 +37,7 @@ class NavigationController extends GetxController {
 
   final screens = [
     MemoPage(), // 순서에 맞게 페이지 정의
+    TodoPage(), //순서 바뀌어 있어서 고쳤음
     Mypage(),
-    TodoPage(),
   ];
 }
