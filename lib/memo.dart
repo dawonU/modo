@@ -22,9 +22,13 @@ class _MemoPageState extends State<MemoPage> {
   }
 
   Future<void> _loadMemos() async {
-    User? user = _auth.currentUser;
+    final user = _auth.currentUser;
     if (user != null) {
-      final snapshot = await _firestore.collection('users').doc(user.uid).collection('memos').get();
+      final snapshot = await _firestore
+          .collection('users')
+          .doc(user.uid)
+          .collection('memos')
+          .get();
       setState(() {
         memos.clear();
         for (var doc in snapshot.docs) {
@@ -40,9 +44,13 @@ class _MemoPageState extends State<MemoPage> {
 
   Future<void> _addMemo() async {
     if (memoController.text.isNotEmpty) {
-      User? user = _auth.currentUser;
+      final user = _auth.currentUser;
       if (user != null) {
-        final docRef = await _firestore.collection('users').doc(user.uid).collection('memos').add({
+        final docRef = await _firestore
+            .collection('users')
+            .doc(user.uid)
+            .collection('memos')
+            .add({
           'content': memoController.text,
           'pinned': false,
         });
@@ -59,10 +67,15 @@ class _MemoPageState extends State<MemoPage> {
   }
 
   Future<void> _deleteMemo(int index) async {
-    User? user = _auth.currentUser;
+    final user = _auth.currentUser;
     if (user != null) {
       final memo = memos[index];
-      await _firestore.collection('users').doc(user.uid).collection('memos').doc(memo['id']).delete();
+      await _firestore
+          .collection('users')
+          .doc(user.uid)
+          .collection('memos')
+          .doc(memo['id'])
+          .delete();
       setState(() {
         memos.removeAt(index);
       });
@@ -70,12 +83,15 @@ class _MemoPageState extends State<MemoPage> {
   }
 
   Future<void> _editMemo(int index, String newContent) async {
-    User? user = _auth.currentUser;
+    final user = _auth.currentUser;
     if (user != null) {
       final memo = memos[index];
-      await _firestore.collection('users').doc(user.uid).collection('memos').doc(memo['id']).update({
-        'content': newContent,
-      });
+      await _firestore
+          .collection('users')
+          .doc(user.uid)
+          .collection('memos')
+          .doc(memo['id'])
+          .update({'content': newContent});
       setState(() {
         memos[index]['content'] = newContent;
       });
@@ -83,13 +99,16 @@ class _MemoPageState extends State<MemoPage> {
   }
 
   Future<void> _togglePin(int index) async {
-    User? user = _auth.currentUser;
+    final user = _auth.currentUser;
     if (user != null) {
       final memo = memos[index];
       final newPinnedStatus = !memo['pinned'];
-      await _firestore.collection('users').doc(user.uid).collection('memos').doc(memo['id']).update({
-        'pinned': newPinnedStatus,
-      });
+      await _firestore
+          .collection('users')
+          .doc(user.uid)
+          .collection('memos')
+          .doc(memo['id'])
+          .update({'pinned': newPinnedStatus});
       setState(() {
         memos[index]['pinned'] = newPinnedStatus;
       });
@@ -112,97 +131,84 @@ class _MemoPageState extends State<MemoPage> {
     final filteredMemos = getFilteredMemos();
     return Scaffold(
       appBar: AppBar(
-        title: const Text(''),
-        backgroundColor: Colors.white, // AppBar 배경색 흰색
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.search),
-            onPressed: () {
-              showSearchDialog();
-            },
-          )
-        ],
+        title: const Text('MEMO'),
       ),
-      body: Container(
-        color: Colors.white, // 본문 배경색 흰색
-        child: Column(
-          children: [
-            SizedBox(height: 10),
-            Expanded(
-              child: ListView.builder(
-                itemCount: filteredMemos.length,
-                itemBuilder: (context, index) {
-                  final memo = filteredMemos[index];
-                  return Card(
-                    elevation: 4,
-                    color: Colors.grey[200], // 메모 배경색을 밝은 회색으로 설정
-                    margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                    child: ListTile(
-                      title: Text(memo['content']),
-                      leading: IconButton(
-                        icon: Icon(
-                          memo['pinned'] ? Icons.push_pin : Icons.push_pin_outlined,
-                          color: memo['pinned'] ? Colors.red : Colors.grey,
-                        ),
-                        onPressed: () => _togglePin(index),
+      body: Column(
+        children: [
+          Expanded(
+            child: ListView.builder(
+              itemCount: filteredMemos.length,
+              itemBuilder: (context, index) {
+                final memo = filteredMemos[index];
+                return Card(
+                  elevation: 4,
+                  margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                  child: ListTile(
+                    title: Text(memo['content']),
+                    leading: IconButton(
+                      icon: Icon(
+                        memo['pinned'] ? Icons.push_pin : Icons.push_pin_outlined,
+                        color: memo['pinned'] ? Colors.red : Colors.grey,
                       ),
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          IconButton(
-                            icon: const Icon(Icons.edit),
-                            onPressed: () {
-                              showEditDialog(index, memo['content']);
-                            },
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.delete),
-                            onPressed: () => _deleteMemo(index),
-                          ),
-                        ],
-                      ),
+                      onPressed: () => _togglePin(index),
                     ),
-                  );
-                },
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: memoController,
-                      style: const TextStyle(color: Colors.black), // 텍스트 색상 검정
-                      decoration: InputDecoration(
-                        labelText: '메모를 입력하세요',
-                        labelStyle: const TextStyle(color: Colors.black), // 라벨 색상 검정
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                          borderSide: const BorderSide(color: Colors.black), // 테두리 색상 검정
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.edit),
+                          onPressed: () {
+                            showEditDialog(index, memo['content']);
+                          },
                         ),
-                        focusedBorder: OutlineInputBorder( // 포커스 시 테두리 색상
-                          borderRadius: BorderRadius.circular(10.0),
-                          borderSide: const BorderSide(color: Colors.black), // 포커스 시 테두리 색상 검정
+                        IconButton(
+                          icon: const Icon(Icons.delete),
+                          onPressed: () => _deleteMemo(index),
                         ),
-                      ),
-                      cursorColor: Colors.black, // 커서 색상 검정
+                      ],
                     ),
                   ),
-                  const SizedBox(width: 8),
-                  ElevatedButton(
-                    onPressed: _addMemo,
-                    child: const Icon(Icons.add, color: Colors.white), // + 아이콘만 표시
-                    style: ElevatedButton.styleFrom(
-                      minimumSize: const Size(50, 50),
-                      backgroundColor: Colors.black, // 배경색 검정
+                );
+              },
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: memoController,
+                    decoration: InputDecoration(
+                      labelText: '메모를 입력하세요',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
                     ),
                   ),
-                ],
-              ),
+                ),
+                const SizedBox(width: 8),
+                ElevatedButton(
+                  onPressed: _addMemo,
+                  child: const Text('+'),
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: const Size(50, 50),
+                    backgroundColor: Colors.pink,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                ElevatedButton(
+                  onPressed: showSearchDialog,
+                  child: const Icon(Icons.search),
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: const Size(50, 50),
+                    backgroundColor: Colors.pink,
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
