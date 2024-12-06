@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class TodoPage extends StatefulWidget {
   @override
@@ -14,9 +17,33 @@ class _TodoPageState extends State<TodoPage> {
   Map<DateTime, List<Color>> dateColors = {};
   final TextEditingController _categoryController = TextEditingController();
   final TextEditingController _taskController = TextEditingController();
-
   Map<String, bool> expandedState = {};
   bool isTwoWeeksView = false; // 2주 보기 상태 변수
+
+  // Firestore 인스턴스 생성
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  User? get currentUser => _auth.currentUser;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCategories();
+  }
+
+  Future<void> _loadCategories() async {
+    if (currentUser != null) {
+      DocumentSnapshot userDoc = await _firestore.collection('users').doc(currentUser!.uid).get();
+      if (userDoc.exists) {
+        setState(() {
+          final data = userDoc.data() as Map<String, dynamic>;
+          categories = Map<String, dynamic>.from(data['categories']);
+          dateColors = (data['dateColors'] as Map<String, dynamic>).map((key, value) => MapEntry(DateTime.parse(key), List<Color>.from(value.map((color) => Color(color)))));
+        });
+      }
+    }
+  }
 
   void _addCategory(Color color) {
     if (_categoryController.text.isNotEmpty) {
@@ -28,6 +55,12 @@ class _TodoPageState extends State<TodoPage> {
         expandedState[_categoryController.text] = true;
         _categoryController.clear();
       });
+
+      // Firestore에 카테고리 추가
+      _firestore.collection('users').doc(currentUser!.uid).set({
+        'categories': categories,
+        'dateColors': dateColors.map((key, value) => MapEntry(key.toIso8601String(), value.map((color) => color.value).toList())),
+      }, SetOptions(merge: true));
     }
   }
 
@@ -41,7 +74,6 @@ class _TodoPageState extends State<TodoPage> {
           'task': task,
           'completed': false,
         });
-
         if (dateColors[date] == null) {
           dateColors[date] = [];
         }
@@ -49,12 +81,36 @@ class _TodoPageState extends State<TodoPage> {
           dateColors[date]!.add(categories[category]['color']);
         }
       });
+
+      // Firestore에 태스크 추가
+      _firestore.collection('users').doc(currentUser!.uid).set({
+        'categories': categories,
+        'dateColors': dateColors.map((key, value) => MapEntry(key.toIso8601String(), value.map((color) => color.value).toList())),
+      }, SetOptions(merge: true));
     }
+  }
+
+  void _deleteTaskFromCategory(String category, DateTime date) {
+    setState(() {
+      categories[category]['tasks'][date]?.removeWhere((task) => task['completed']);
+      if (categories[category]['tasks'][date]?.isEmpty ?? true) {
+        categories[category]['tasks'].remove(date);
+        dateColors[date]?.remove(categories[category]['color']);
+        if (dateColors[date]?.isEmpty ?? true) {
+          dateColors.remove(date);
+        }
+      }
+    });
+
+    // Firestore에서 태스크 삭제
+    _firestore.collection('users').doc(currentUser!.uid).set({
+      'categories': categories,
+      'dateColors': dateColors.map((key, value) => MapEntry(key.toIso8601String(), value.map((color) => color.value).toList())),
+    }, SetOptions(merge: true));
   }
 
   void _showCategoryDialog() {
     Color selectedColor = const Color(0xFFFFFFFF);
-
     showDialog(
       context: context,
       builder: (context) {
@@ -95,7 +151,7 @@ class _TodoPageState extends State<TodoPage> {
             TextButton(
               onPressed: () => Navigator.pop(context),
               child: const Text(
-                  '취소',
+                '취소',
                 style: TextStyle(color: Colors.white),
               ),
               style: TextButton.styleFrom(
@@ -108,7 +164,7 @@ class _TodoPageState extends State<TodoPage> {
                 Navigator.pop(context);
               },
               child: const Text(
-                  '추가',
+                '추가',
                 style: TextStyle(color: Colors.white),
               ),
               style: ElevatedButton.styleFrom(
@@ -204,20 +260,39 @@ class _TodoPageState extends State<TodoPage> {
                 );
               },
               selectedBuilder: (context, date, _) {
-                return Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 1.5),
-                  width: 40, // 동그라미의 너비
-                  height: 50, // 동그라미의 높이
-                  decoration: BoxDecoration(
-                    color: Colors.grey.withOpacity(0.8), // 선택된 날짜의 배경색
-                    shape: BoxShape.circle,
-                  ),
-                  child: Center(
-                    child: Text(
-                      '${date.day}',
-                      style: TextStyle(color: Colors.black), // 선택된 날짜의 텍스트 색상
+                return Column(
+                  children: [
+                    Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 1.5),
+                      width: 40, // 동그라미의 너비
+                      height: 50, // 동그라미의 높이
+                      decoration: BoxDecoration(
+                        color: Colors.grey.withOpacity(0.8), // 선택된 날짜의 배경색
+                        shape: BoxShape.circle,
+                      ),
+                      child: Center(
+                        child: Text(
+                          '${date.day}',
+                          style: TextStyle(color: Colors.black), // 선택된 날짜의 텍스트 색상
+                        ),
+                      ),
                     ),
-                  ),
+                    if (dateColors[date] != null)
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: dateColors[date]!.map((color) {
+                          return Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 1.5),
+                            width: 8,
+                            height: 8,
+                            decoration: BoxDecoration(
+                              color: color,
+                              shape: BoxShape.circle,
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                  ],
                 );
               },
             ),
@@ -248,7 +323,6 @@ class _TodoPageState extends State<TodoPage> {
                 final categoryName = categories.keys.elementAt(index);
                 final categoryColor = categories[categoryName]['color'];
                 final tasks = categories[categoryName]['tasks'][_selectedDay] ?? [];
-
                 return Padding(
                   padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 16.0),
                   child: Container(
@@ -290,6 +364,14 @@ class _TodoPageState extends State<TodoPage> {
                                     _showAddTaskDialog(categoryName);
                                   },
                                   icon: const Icon(Icons.add_circle_outline, size: 15),
+                                  color: Colors.grey,
+                                ),
+                                IconButton(
+                                  onPressed: () {
+                                    // 태스크 삭제 기능 추가
+                                    _deleteTaskFromCategory(categoryName, _selectedDay);
+                                  },
+                                  icon: const Icon(Icons.remove_circle_outline, size: 15),
                                   color: Colors.grey,
                                 ),
                                 IconButton(

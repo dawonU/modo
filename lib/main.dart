@@ -22,7 +22,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: NavigationMenu() //NavigationMenu()
+      home: LogIn(), // LogIn 화면으로 연결
     );
   }
 }

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class MemoPage extends StatefulWidget {
   @override
@@ -10,34 +12,88 @@ class _MemoPageState extends State<MemoPage> {
   final TextEditingController memoController = TextEditingController();
   String searchKeyword = ''; // 검색 키워드
 
-  void _addMemo() {
-    if (memoController.text.isNotEmpty) {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadMemos();
+  }
+
+  Future<void> _loadMemos() async {
+    User? user = _auth.currentUser;
+    if (user != null) {
+      final snapshot = await _firestore.collection('users').doc(user.uid).collection('memos').get();
       setState(() {
-        memos.add({
-          'content': memoController.text,
-          'pinned': false, // 상단 고정 여부
-        });
-        memoController.clear();
+        memos.clear();
+        for (var doc in snapshot.docs) {
+          memos.add({
+            'id': doc.id,
+            'content': doc['content'],
+            'pinned': doc['pinned'],
+          });
+        }
       });
     }
   }
 
-  void _deleteMemo(int index) {
-    setState(() {
-      memos.removeAt(index);
-    });
+  Future<void> _addMemo() async {
+    if (memoController.text.isNotEmpty) {
+      User? user = _auth.currentUser;
+      if (user != null) {
+        final docRef = await _firestore.collection('users').doc(user.uid).collection('memos').add({
+          'content': memoController.text,
+          'pinned': false,
+        });
+        setState(() {
+          memos.add({
+            'id': docRef.id,
+            'content': memoController.text,
+            'pinned': false,
+          });
+          memoController.clear();
+        });
+      }
+    }
   }
 
-  void _editMemo(int index, String newContent) {
-    setState(() {
-      memos[index]['content'] = newContent;
-    });
+  Future<void> _deleteMemo(int index) async {
+    User? user = _auth.currentUser;
+    if (user != null) {
+      final memo = memos[index];
+      await _firestore.collection('users').doc(user.uid).collection('memos').doc(memo['id']).delete();
+      setState(() {
+        memos.removeAt(index);
+      });
+    }
   }
 
-  void _togglePin(int index) {
-    setState(() {
-      memos[index]['pinned'] = !memos[index]['pinned'];
-    });
+  Future<void> _editMemo(int index, String newContent) async {
+    User? user = _auth.currentUser;
+    if (user != null) {
+      final memo = memos[index];
+      await _firestore.collection('users').doc(user.uid).collection('memos').doc(memo['id']).update({
+        'content': newContent,
+      });
+      setState(() {
+        memos[index]['content'] = newContent;
+      });
+    }
+  }
+
+  Future<void> _togglePin(int index) async {
+    User? user = _auth.currentUser;
+    if (user != null) {
+      final memo = memos[index];
+      final newPinnedStatus = !memo['pinned'];
+      await _firestore.collection('users').doc(user.uid).collection('memos').doc(memo['id']).update({
+        'pinned': newPinnedStatus,
+      });
+      setState(() {
+        memos[index]['pinned'] = newPinnedStatus;
+      });
+    }
   }
 
   List<Map<String, dynamic>> getFilteredMemos() {

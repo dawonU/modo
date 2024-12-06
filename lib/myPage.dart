@@ -1,25 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
-
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
-  runApp(MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'My Page',
-      theme: ThemeData.light(),
-      home: Mypage(),
-    );
-  }
-}
 
 class Mypage extends StatefulWidget {
   @override
@@ -33,6 +16,7 @@ class _MypageState extends State<Mypage> {
   File? _image;
   final ImagePicker _picker = ImagePicker();
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   @override
   void initState() {
@@ -40,11 +24,31 @@ class _MypageState extends State<Mypage> {
     _loadUserInfo();
   }
 
-  void _loadUserInfo() {
+  Future<void> _loadUserInfo() async {
     User? user = _auth.currentUser;
     if (user != null) {
-      _nameController.text = user.displayName ?? '';
-      _emailController.text = user.email ?? '';
+      DocumentSnapshot userDoc = await _firestore.collection('users').doc(user.uid).get();
+      if (userDoc.exists) {
+        setState(() {
+          _nameController.text = userDoc['name'] ?? '';
+          _emailController.text = userDoc['email'] ?? '';
+          _isDarkMode = userDoc['isDarkMode'] ?? false;
+        });
+      } else {
+        _nameController.text = user.displayName ?? '';
+        _emailController.text = user.email ?? '';
+      }
+    }
+  }
+
+  Future<void> _saveUserInfo() async {
+    User? user = _auth.currentUser;
+    if (user != null) {
+      await _firestore.collection('users').doc(user.uid).set({
+        'name': _nameController.text,
+        'email': _emailController.text,
+        'isDarkMode': _isDarkMode,
+      });
     }
   }
 
@@ -61,6 +65,7 @@ class _MypageState extends State<Mypage> {
     setState(() {
       _isDarkMode = !_isDarkMode;
     });
+    _saveUserInfo();
   }
 
   void _showEmailDialog() {
@@ -90,6 +95,7 @@ class _MypageState extends State<Mypage> {
                     setState(() {
                       _emailController.text = newEmail;
                     });
+                    _saveUserInfo();
                   }
                   Navigator.of(context).pop();
                 } catch (e) {
@@ -239,6 +245,7 @@ class _MypageState extends State<Mypage> {
                                 _nameController.text = newValue;
                               }
                             });
+                            _saveUserInfo();
                             Navigator.of(context).pop();
                           },
                           child: Text('저장'),
@@ -261,6 +268,4 @@ class _MypageState extends State<Mypage> {
       ),
     );
   }
-
 }
-
