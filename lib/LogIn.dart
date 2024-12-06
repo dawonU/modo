@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'SignUp.dart'; // SignUpScreen을 가져옵니다.
 
 void main() => runApp(LogIn());
@@ -28,6 +29,9 @@ class _LoginPageState extends State<LoginPage> {
   final FocusNode passwordFocusNode = FocusNode();
   double welcomeTextMargin = 200; // Welcome 텍스트와 입력 필드 간의 간격
 
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  String? _errorMessage;
+
   @override
   void initState() {
     super.initState();
@@ -46,20 +50,34 @@ class _LoginPageState extends State<LoginPage> {
     });
   }
 
-  void _login() {
-    // 로그인 로직 구현
+  void _login() async {
     String email = emailController.text;
     String password = passwordController.text;
 
-    if (email == 'test@example.com' && password == 'password123') {
+    try {
+      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('로그인 성공!')),
       );
       // 로그인 성공 후 다음 화면으로 이동
       // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => NextPage()));
-    } else {
+    } on FirebaseAuthException catch (e) {
+      String message;
+      if (e.code == 'user-not-found') {
+        message = '사용자를 찾을 수 없습니다.';
+      } else if (e.code == 'wrong-password') {
+        message = '잘못된 비밀번호입니다.';
+      } else {
+        message = '로그인에 실패했습니다. 다시 시도해주세요.';
+      }
+      setState(() {
+        _errorMessage = message;
+      });
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('이메일 또는 비밀번호가 잘못되었습니다.')),
+        SnackBar(content: Text(_errorMessage!)),
       );
     }
   }
@@ -69,6 +87,34 @@ class _LoginPageState extends State<LoginPage> {
       context,
       MaterialPageRoute(builder: (context) => SignUpScreen()), // SignUpScreen으로 이동
     );
+  }
+
+  void _resetPassword() async {
+    String email = emailController.text;
+
+    if (email.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('이메일을 입력해주세요.')),
+      );
+      return;
+    }
+
+    try {
+      await _auth.sendPasswordResetEmail(email: email);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('비밀번호 재설정 이메일을 보냈습니다.')),
+      );
+    } on FirebaseAuthException catch (e) {
+      String message;
+      if (e.code == 'user-not-found') {
+        message = '사용자를 찾을 수 없습니다.';
+      } else {
+        message = '비밀번호 재설정에 실패했습니다. 다시 시도해주세요.';
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(message)),
+      );
+    }
   }
 
   @override
@@ -177,6 +223,18 @@ class _LoginPageState extends State<LoginPage> {
                     onPressed: _navigateToSignUp,
                     child: Text(
                       '가입하기',
+                      style: TextStyle(
+                        color: Colors.pink, // 핑크색 텍스트
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 10),
+                Center(
+                  child: TextButton(
+                    onPressed: _resetPassword,
+                    child: Text(
+                      '비밀번호 재설정',
                       style: TextStyle(
                         color: Colors.pink, // 핑크색 텍스트
                       ),
