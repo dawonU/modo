@@ -9,13 +9,14 @@ class TodoPage extends StatefulWidget {
 
 class _TodoPageState extends State<TodoPage> {
   DateTime _focusedDay = DateTime.now();
-  DateTime? _selectedDay;
+  DateTime _selectedDay = DateTime.now();
   Map<String, dynamic> categories = {};
   Map<DateTime, List<Color>> dateColors = {};
   final TextEditingController _categoryController = TextEditingController();
   final TextEditingController _taskController = TextEditingController();
 
   Map<String, bool> expandedState = {};
+  bool isTwoWeeksView = false; // 2주 보기 상태 변수
 
   void _addCategory(Color color) {
     if (_categoryController.text.isNotEmpty) {
@@ -41,7 +42,6 @@ class _TodoPageState extends State<TodoPage> {
           'completed': false,
         });
 
-        // Add the category's color to the date in the calendar
         if (dateColors[date] == null) {
           dateColors[date] = [];
         }
@@ -59,6 +59,7 @@ class _TodoPageState extends State<TodoPage> {
       context: context,
       builder: (context) {
         return AlertDialog(
+          backgroundColor: Colors.white,
           title: const Text('카테고리 추가'),
           content: SingleChildScrollView(
             child: Column(
@@ -93,14 +94,26 @@ class _TodoPageState extends State<TodoPage> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('취소'),
+              child: const Text(
+                  '취소',
+                style: TextStyle(color: Colors.white),
+              ),
+              style: TextButton.styleFrom(
+                backgroundColor: Colors.black, // 배경색을 검정색으로 설정
+              ),
             ),
             ElevatedButton(
               onPressed: () {
                 _addCategory(selectedColor);
                 Navigator.pop(context);
               },
-              child: const Text('추가'),
+              child: const Text(
+                  '추가',
+                style: TextStyle(color: Colors.white),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.black,
+              ),
             ),
           ],
         );
@@ -126,7 +139,7 @@ class _TodoPageState extends State<TodoPage> {
             ElevatedButton(
               onPressed: () {
                 if (_selectedDay != null) {
-                  _addTaskToCategory(category, _selectedDay!, _taskController.text);
+                  _addTaskToCategory(category, _selectedDay, _taskController.text);
                   _taskController.clear();
                   Navigator.pop(dialogContext);
                 } else {
@@ -143,24 +156,33 @@ class _TodoPageState extends State<TodoPage> {
     );
   }
 
+  void _toggleCalendarView() {
+    setState(() {
+      isTwoWeeksView = !isTwoWeeksView; // 2주 보기 상태 토글
+      if (!isTwoWeeksView) {
+        _focusedDay = DateTime.now(); // 월 버튼 클릭 시 현재 날짜로 리셋
+        _selectedDay = DateTime.now(); // 현재 날짜 선택
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Todo by Category'),
-      ),
+      backgroundColor: Colors.white,
       body: Column(
         children: [
+          SizedBox(height: 85), // 간격 조정
           TableCalendar(
             focusedDay: _focusedDay,
             firstDay: DateTime.utc(2000, 1, 1),
             lastDay: DateTime.utc(2100, 12, 31),
-            calendarFormat: CalendarFormat.month,
+            calendarFormat: isTwoWeeksView ? CalendarFormat.twoWeeks : CalendarFormat.month, // 2주 또는 월 형식 설정
             selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
             onDaySelected: (selectedDay, focusedDay) {
               setState(() {
-                _selectedDay = selectedDay;
-                _focusedDay = focusedDay;
+                _selectedDay = selectedDay; // 선택된 날짜 업데이트
+                _focusedDay = focusedDay; // 포커스된 날짜 업데이트
               });
             },
             calendarBuilders: CalendarBuilders(
@@ -171,14 +193,31 @@ class _TodoPageState extends State<TodoPage> {
                   children: dateColors[date]!.map((color) {
                     return Container(
                       margin: const EdgeInsets.symmetric(horizontal: 1.5),
-                      width: 8,
-                      height: 8,
+                      width: 24,
+                      height: 24,
                       decoration: BoxDecoration(
                         color: color,
                         shape: BoxShape.circle,
                       ),
                     );
                   }).toList(),
+                );
+              },
+              selectedBuilder: (context, date, _) {
+                return Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 1.5),
+                  width: 40, // 동그라미의 너비
+                  height: 50, // 동그라미의 높이
+                  decoration: BoxDecoration(
+                    color: Colors.grey.withOpacity(0.8), // 선택된 날짜의 배경색
+                    shape: BoxShape.circle,
+                  ),
+                  child: Center(
+                    child: Text(
+                      '${date.day}',
+                      style: TextStyle(color: Colors.black), // 선택된 날짜의 텍스트 색상
+                    ),
+                  ),
                 );
               },
             ),
@@ -189,19 +228,19 @@ class _TodoPageState extends State<TodoPage> {
             child: ElevatedButton.icon(
               onPressed: _showCategoryDialog,
               icon: const Icon(Icons.add, size: 20),
-              label: const Text('카테고리 추가', style: TextStyle(fontSize: 14)),
+              label: const Text('카테고리 등록', style: TextStyle(fontSize: 14)),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.grey[700],
-                foregroundColor: Colors.white,
+                backgroundColor: Colors.black, // 버튼 배경 색상
+                foregroundColor: Colors.white, // 버튼 텍스트 색상
                 elevation: 0,
-                minimumSize: const Size.fromHeight(50),
+                minimumSize: const Size(150, 40), // 가로 세로 길이
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(12), // 둥근 모서리
                 ),
               ),
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 10), // 간격 조정
           Expanded(
             child: ListView.builder(
               itemCount: categories.length,
@@ -250,7 +289,7 @@ class _TodoPageState extends State<TodoPage> {
                                   onPressed: () {
                                     _showAddTaskDialog(categoryName);
                                   },
-                                  icon: const Icon(Icons.add_circle_outline, size: 20),
+                                  icon: const Icon(Icons.add_circle_outline, size: 15),
                                   color: Colors.grey,
                                 ),
                                 IconButton(

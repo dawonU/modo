@@ -132,9 +132,9 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.pink[50], // AppBar 배경색을 흰색으로 설정
+        backgroundColor: Colors.white, // AppBar 배경색을 흰색으로 설정
       ),
-      backgroundColor: Colors.pink[50],
+      backgroundColor: Colors.white,
       body: Center(
         child: Container(
           padding: const EdgeInsets.all(16.0),
@@ -216,7 +216,7 @@ class _LoginPageState extends State<LoginPage> {
                   child: Text('로그인'),
                   style: ElevatedButton.styleFrom(
                     minimumSize: Size(double.infinity, 50),
-                    backgroundColor: Colors.pink,
+                    backgroundColor: Colors.black,
                     foregroundColor: Colors.white,
                   ),
                 ),
@@ -227,7 +227,7 @@ class _LoginPageState extends State<LoginPage> {
                     child: Text(
                       '가입하기',
                       style: TextStyle(
-                        color: Colors.pink, // 핑크색 텍스트
+                        color: Colors.black,
                       ),
                     ),
                   ),
@@ -239,7 +239,7 @@ class _LoginPageState extends State<LoginPage> {
                     child: Text(
                       '비밀번호 재설정',
                       style: TextStyle(
-                        color: Colors.pink, // 핑크색 텍스트
+                        color: Colors.black,
                       ),
                     ),
                   ),

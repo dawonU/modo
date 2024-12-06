@@ -76,9 +76,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.pink[50],
+        backgroundColor: Colors.white,
       ),
-      backgroundColor: Colors.pink[50],
+      backgroundColor: Colors.white,
       body: Center(
         child: Container(
           padding: const EdgeInsets.all(16.0),
@@ -175,7 +175,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       Text(
                         _errorMessage!,
                         style: TextStyle(
-                          color: Colors.pink,
+                          color: Colors.black,
                           fontSize: 12,
                         ),
                       ),
@@ -186,7 +186,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   onPressed: _signUp,
                   child: Text('가입하기'),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.pink,
+                    backgroundColor: Colors.black,
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),

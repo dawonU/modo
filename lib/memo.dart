@@ -6,16 +6,16 @@ class MemoPage extends StatefulWidget {
 }
 
 class _MemoPageState extends State<MemoPage> {
-  final List<Map<String, dynamic>> memos = []; //메모 리스트
+  final List<Map<String, dynamic>> memos = []; // 메모 리스트
   final TextEditingController memoController = TextEditingController();
-  String searchKeyword = ''; //검색 키워드
+  String searchKeyword = ''; // 검색 키워드
 
   void _addMemo() {
     if (memoController.text.isNotEmpty) {
       setState(() {
         memos.add({
           'content': memoController.text,
-          'pinned': false, //상단 고정 여부
+          'pinned': false, // 상단 고정 여부
         });
         memoController.clear();
       });
@@ -46,8 +46,7 @@ class _MemoPageState extends State<MemoPage> {
         memo['content'].toLowerCase().contains(searchKeyword.toLowerCase()))
         .toList();
 
-
-    filtered.sort((a, b) => (b['pinned'] ? 1 :0).compareTo(a['pinned'] ? 1 :0));
+    filtered.sort((a, b) => (b['pinned'] ? 1 : 0).compareTo(a['pinned'] ? 1 : 0));
 
     return filtered;
   }
@@ -57,7 +56,8 @@ class _MemoPageState extends State<MemoPage> {
     final filteredMemos = getFilteredMemos();
     return Scaffold(
       appBar: AppBar(
-        title: const Text('MEMO'),
+        title: const Text(''),
+        backgroundColor: Colors.white, // AppBar 배경색 흰색
         actions: [
           IconButton(
             icon: const Icon(Icons.search),
@@ -67,73 +67,86 @@ class _MemoPageState extends State<MemoPage> {
           )
         ],
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: ListView.builder(
-              itemCount: filteredMemos.length,
-              itemBuilder: (context, index) {
-                final memo = filteredMemos[index];
-                return Card(
-                  elevation: 4,
-                  margin: const EdgeInsets.symmetric(vertical:8, horizontal:16),
-                  child: ListTile(
-                    title: Text(memo['content']),
-                    leading: IconButton(
-                      icon: Icon(
-                        memo['pinned'] ? Icons.push_pin : Icons.push_pin_outlined,
-                        color: memo['pinned'] ? Colors.red : Colors.grey,
+      body: Container(
+        color: Colors.white, // 본문 배경색 흰색
+        child: Column(
+          children: [
+            SizedBox(height: 10),
+            Expanded(
+              child: ListView.builder(
+                itemCount: filteredMemos.length,
+                itemBuilder: (context, index) {
+                  final memo = filteredMemos[index];
+                  return Card(
+                    elevation: 4,
+                    color: Colors.grey[200], // 메모 배경색을 밝은 회색으로 설정
+                    margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                    child: ListTile(
+                      title: Text(memo['content']),
+                      leading: IconButton(
+                        icon: Icon(
+                          memo['pinned'] ? Icons.push_pin : Icons.push_pin_outlined,
+                          color: memo['pinned'] ? Colors.red : Colors.grey,
+                        ),
+                        onPressed: () => _togglePin(index),
                       ),
-                      onPressed: () => _togglePin(index),
-                    ),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.edit),
-                          onPressed: () {
-                            showEditDialog(index, memo['content']);
-                          },
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.delete),
-                          onPressed: () => _deleteMemo(index),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: memoController,
-                    decoration: InputDecoration(
-                      labelText: '메모를 입력하세요',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10.0),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.edit),
+                            onPressed: () {
+                              showEditDialog(index, memo['content']);
+                            },
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.delete),
+                            onPressed: () => _deleteMemo(index),
+                          ),
+                        ],
                       ),
                     ),
-                  ),
-                ),
-                const SizedBox(width:8),
-                ElevatedButton(
-                  onPressed: _addMemo,
-                  child: const Text('+'),
-                  style: ElevatedButton.styleFrom(
-                    minimumSize: const Size(50,50),
-                    backgroundColor: Colors.pink,
-                  ),
-                ),
-              ],
+                  );
+                },
+              ),
             ),
-          ),
-        ],
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: memoController,
+                      style: const TextStyle(color: Colors.black), // 텍스트 색상 검정
+                      decoration: InputDecoration(
+                        labelText: '메모를 입력하세요',
+                        labelStyle: const TextStyle(color: Colors.black), // 라벨 색상 검정
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                          borderSide: const BorderSide(color: Colors.black), // 테두리 색상 검정
+                        ),
+                        focusedBorder: OutlineInputBorder( // 포커스 시 테두리 색상
+                          borderRadius: BorderRadius.circular(10.0),
+                          borderSide: const BorderSide(color: Colors.black), // 포커스 시 테두리 색상 검정
+                        ),
+                      ),
+                      cursorColor: Colors.black, // 커서 색상 검정
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  ElevatedButton(
+                    onPressed: _addMemo,
+                    child: const Icon(Icons.add, color: Colors.white), // + 아이콘만 표시
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: const Size(50, 50),
+                      backgroundColor: Colors.black, // 배경색 검정
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
