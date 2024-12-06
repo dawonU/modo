@@ -21,7 +21,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: LogIn(), // LogIn 화면으로 연결
+      home: LoginPage(), // LogIn 화면으로 연결
     );
   }
 }

@@ -177,20 +177,22 @@ class _TodoPageState extends State<TodoPage> {
           ),
           actions: [
             TextButton(
+              style: TextButton.styleFrom(
+                backgroundColor: Colors.black87,
+                foregroundColor: Colors.white, // 텍스트 색상
+              ),
               onPressed: () => Navigator.pop(dialogContext),
               child: const Text('취소'),
             ),
             ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.black87,
+                foregroundColor: Colors.white, // 텍스트 색상
+              ),
               onPressed: () {
-                if (_selectedDay != null) {
-                  _addTaskToCategory(category, _selectedDay, _taskController.text);
-                  _taskController.clear();
-                  Navigator.pop(dialogContext);
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('날짜를 선택하세요!')),
-                  );
-                }
+                _addTaskToCategory(category, _selectedDay, _taskController.text);
+                _taskController.clear();
+                Navigator.pop(dialogContext);
               },
               child: const Text('추가'),
             ),
@@ -199,6 +201,7 @@ class _TodoPageState extends State<TodoPage> {
       },
     );
   }
+
 
   void _toggleCalendarView() {
     setState(() {

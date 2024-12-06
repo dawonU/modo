@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:modo/todo.dart';
-
+import 'package:modo/weather.dart';
 import 'memo.dart';
 import 'myPage.dart';
 
@@ -19,27 +19,59 @@ class NavigationMenu extends StatelessWidget {
           elevation: 0,
           selectedIndex: controller.selectedIndex.value,
           onDestinationSelected: (index) => controller.selectedIndex.value = index,
-          backgroundColor: Colors.white,
-          destinations: const [
+          backgroundColor: Colors.white, // 하단 내비게이션 바 배경색을 흰색으로 설정
+          destinations: [
             NavigationDestination(
               icon: Icon(Icons.article_outlined),
               label: "Memo",
-              selectedIcon: Icon(Icons.article_outlined, color: Colors.black), // 선택된 아이콘 색상 조정
+              selectedIcon: Container(
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(Icons.article_outlined, color: Colors.black),
+              ),
             ),
             NavigationDestination(
               icon: Icon(Icons.format_list_bulleted_outlined),
               label: "Todo",
-              selectedIcon: Icon(Icons.format_list_bulleted_outlined, color: Colors.black), // 선택된 아이콘 색상 조정
+              selectedIcon: Container(
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(Icons.format_list_bulleted_outlined, color: Colors.black),
+              ),
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.sunny_snowing),
+              label: "Weather",
+              selectedIcon: Container(
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(Icons.sunny_snowing, color: Colors.black),
+              ),
             ),
             NavigationDestination(
               icon: Icon(Icons.account_circle_outlined),
               label: "MyPage",
-              selectedIcon: Icon(Icons.account_circle_outlined, color: Colors.black), // 선택된 아이콘 색상 조정
+              selectedIcon: Container(
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(Icons.account_circle_outlined, color: Colors.black),
+              ),
             ),
           ],
         ),
       ),
-      body: Obx(() => controller.screens[controller.selectedIndex.value]),
+      body: Container(
+        color: Colors.white, // body 배경색을 흰색으로 설정
+        child: Obx(() => controller.screens[controller.selectedIndex.value]),
+      ),
     );
   }
 }
@@ -48,8 +80,9 @@ class NavigationController extends GetxController {
   final Rx<int> selectedIndex = 0.obs;
 
   final screens = [
-    MemoPage(), // 순서에 맞게 페이지 정의
-    TodoPage(), // 순서 바뀌어 있어서 고쳤음
+    MemoPage(),
+    TodoPage(),
+    WeatherPage(),
     Mypage(),
   ];
 }
