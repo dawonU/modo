@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "562595065065",
+    "project_id": "modoweb1234",
+    "storage_bucket": "modoweb1234.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:562595065065:android:f0056be5c82d045ff3d478",
+        "android_client_info": {
+          "package_name": "com.example.modo"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBck02MebAqx0BZ7lG_qvA5wih7STr8LB0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
