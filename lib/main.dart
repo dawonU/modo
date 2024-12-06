@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:modo/LogIn.dart';
-import 'navigation_bar.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
