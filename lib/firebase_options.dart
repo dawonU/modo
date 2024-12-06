@@ -31,7 +31,11 @@ class DefaultFirebaseOptions {
       case TargetPlatform.linux:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for linux - '
+<<<<<<< HEAD
               'you can reconfigure this by running the FlutterFire CLI again.',
+=======
+          'you can reconfigure this by running the FlutterFire CLI again.',
+>>>>>>> master
         );
       default:
         throw UnsupportedError(
@@ -83,4 +87,8 @@ class DefaultFirebaseOptions {
     authDomain: 'modoweb1234.firebaseapp.com',
     storageBucket: 'modoweb1234.firebasestorage.app',
   );
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> master

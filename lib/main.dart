@@ -25,4 +25,8 @@ class MyApp extends StatelessWidget {
       home: LogIn(), //NavigationMenu()
     );
   }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> master
