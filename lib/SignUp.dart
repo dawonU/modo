@@ -19,14 +19,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  void _clearName() {
-    setState(() {
-      _nameController.clear();
-    });
-  }
 
   void _signUp() async {
-    String name = _nameController.text;
     String email = _emailController.text;
     String password = _passwordController.text;
     String confirmPassword = _confirmPasswordController.text;

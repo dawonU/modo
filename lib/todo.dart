@@ -200,15 +200,6 @@ class _TodoPageState extends State<TodoPage> {
     );
   }
 
-  void _toggleCalendarView() {
-    setState(() {
-      isTwoWeeksView = !isTwoWeeksView; // 2주 보기 상태 토글
-      if (!isTwoWeeksView) {
-        _focusedDay = DateTime.now(); // 월 버튼 클릭 시 현재 날짜로 리셋
-        _selectedDay = DateTime.now(); // 현재 날짜 선택
-      }
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
